@@ -11,7 +11,7 @@ export type EngineFlavor = {
 export const DEFAULT_FLAVOR: EngineFlavor = {
   cylinders: 4,
   pipe: "straight",
-  aggression: 0.62,
+  aggression: 0.86,
 };
 
 export type AppMode = "free" | "practice";

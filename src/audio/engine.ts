@@ -72,14 +72,14 @@ export class EngineSynth {
       const clickGain = ctx.createGain();
       clickGain.gain.value = 1;
       const compressor = ctx.createDynamicsCompressor();
-      compressor.threshold.value = -14;
-      compressor.knee.value = 8;
-      compressor.ratio.value = 2.4;
-      compressor.attack.value = 0.004;
-      compressor.release.value = 0.16;
+      compressor.threshold.value = -4;
+      compressor.knee.value = 2;
+      compressor.ratio.value = 1.35;
+      compressor.attack.value = 0.001;
+      compressor.release.value = 0.06;
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 256;
-      analyser.smoothingTimeConstant = 0.68;
+      analyser.smoothingTimeConstant = 0.42;
 
       node.connect(master);
       clickGain.connect(master);
@@ -143,20 +143,20 @@ export class EngineSynth {
   }
 
   private heardGain(): number {
-    return this.volume * 0.85;
+    return this.volume * 0.92;
   }
 
   private advance(dt: number): void {
     const redline = redlineFor(this.flavor.cylinders);
     const nowSec = performance.now() / 1000;
     const hunt =
-      Math.sin(nowSec * 2.3) * (16 + this.flavor.aggression * 34) +
-      Math.sin(nowSec * 6.1) * this.flavor.aggression * 12;
-    const idle = 960 + hunt;
-    const ceiling = redline + 650;
+      Math.sin(nowSec * 3.1) * (36 + this.flavor.aggression * 70) +
+      Math.sin(nowSec * 8.4) * this.flavor.aggression * 28;
+    const idle = 1180 + hunt;
+    const ceiling = redline + 900;
     const target = idle + this.throttle * (ceiling - idle);
     const opening = target > this.rpm;
-    const rate = opening ? 6.5 + this.flavor.aggression * 5.5 : 2.15;
+    const rate = opening ? 11 + this.flavor.aggression * 8 : 2.6;
     this.rpm += (target - this.rpm) * (1 - Math.exp(-rate * dt));
     if (this.rpm < 700) this.rpm = 700;
 
@@ -168,12 +168,12 @@ export class EngineSynth {
     }
 
     this.limiterPhase += dt;
-    const period = 0.095 - this.flavor.aggression * 0.035;
+    const period = 0.052 - this.flavor.aggression * 0.018;
     if (this.limiterPhase < period) return;
-    this.rpm = redline - (380 + this.flavor.aggression * 420);
+    this.rpm = redline - (700 + this.flavor.aggression * 520);
     this.limiterPhase = 0;
     const audioNow = this.ctx?.currentTime ?? 0;
-    this.cutUntil = audioNow + 0.028 + (1 - this.flavor.aggression) * 0.02;
+    this.cutUntil = audioNow + 0.04 + (1 - this.flavor.aggression) * 0.012;
   }
 
   private postParams(): void {
